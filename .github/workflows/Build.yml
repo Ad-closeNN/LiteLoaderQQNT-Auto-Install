@@ -6,37 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  UPX:
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set-up
-        shell: bash
-        run: |
-            pip install pyinstaller
-            pip install requests
-            curl -o upx.zip https://github.com/upx/upx/releases/download/v4.2.4/upx-4.2.4-win64.zip
-            mkdir upx
-        
-      - name: Unzip UPX
-        run: |
-            Expand-Archive -Path "upx.zip" -DestinationPath ".\upx\"
-
-      - name: Build with pyinstaller
-        run: |
-            pyinstaller --onefile --upx-dir="upx" "LiteLoaderQQNT Auto Install.py" --strip
-
-      - name: Upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: "[有 UPX 压缩] LiteLoaderQQNT Auto Install"
-          path: |
-            dist/LiteLoaderQQNT Auto Install.exe
-    
-  No-UPX:
+  Build:
     runs-on: windows-latest
 
     steps:
@@ -56,6 +26,6 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: "[无 UPX 压缩] Python - LiteLoaderQQNT Auto Install"
+          name: "LiteLoaderQQNT Auto Install.exe"
           path: |
             dist/LiteLoaderQQNT Auto Install.exe
