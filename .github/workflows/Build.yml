@@ -18,7 +18,7 @@ jobs:
         run: |
             pip install pyinstaller
             pip install requests
-            python "Get-upx.py"
+            python ".github/workflows/Get-upx.py"
             set /p content=<url
             echo CONTENT=%content% >> %GITHUB_ENV%
             curl -L -o upx.zip %content%
@@ -36,7 +36,7 @@ jobs:
           path: |
             dist/LiteLoaderQQNT Auto Install.exe
     
-  NoUpx:
+  No-UPX:
     runs-on: windows-latest
 
     steps:
