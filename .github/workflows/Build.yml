@@ -1,0 +1,61 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  UPX:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set-up
+        shell: bash
+        run: |
+            pip install pyinstaller
+            pip install requests
+            python "Get-upx.py"
+            set /p content=<url
+            echo CONTENT=%content% >> %GITHUB_ENV%
+            curl -L -o upx.zip %content%
+            mkdir upx
+            tar -xf "upx.zip" -C upx --strip-components=1
+
+      - name: Build with pyinstaller
+        run: |
+            pyinstaller --onefile --upx-dir="upx" "LiteLoaderQQNT Auto Install.py" --strip
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: "[有 UPX 压缩] LiteLoaderQQNT Auto Install"
+          path: |
+            dist/LiteLoaderQQNT Auto Install.exe
+    
+  NoUpx:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set-up
+        shell: bash
+        run: |
+            pip install pyinstaller
+            pip install requests
+
+      - name: Build with pyinstaller
+        run: |
+            pyinstaller --onefile "LiteLoaderQQNT Auto Install.py"
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: "[无 UPX 压缩] Python - LiteLoaderQQNT Auto Install"
+          path: |
+            dist/LiteLoaderQQNT Auto Install.exe
