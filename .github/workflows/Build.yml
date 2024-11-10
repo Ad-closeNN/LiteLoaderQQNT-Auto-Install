@@ -18,12 +18,12 @@ jobs:
         run: |
             pip install pyinstaller
             pip install requests
-            curl -o upx.zip "https://github.com/upx/upx/releases/download/v4.2.4/upx-4.2.4-win64.zip"
+            curl -o upx.zip https://github.com/upx/upx/releases/download/v4.2.4/upx-4.2.4-win64.zip
             mkdir upx
         
       - name: Unzip UPX
         run: |
-            Expand-Archive -Path "upx.zip" -DestinationPath "upx\"
+            Expand-Archive -Path "upx.zip" -DestinationPath ".\upx\"
 
       - name: Build with pyinstaller
         run: |
