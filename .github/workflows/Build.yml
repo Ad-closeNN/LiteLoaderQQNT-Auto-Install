@@ -23,7 +23,7 @@ jobs:
         
       - name: Unzip UPX
         run: |
-            Expand-Archive -Path "upx.zip" -DestinationPath "upx"
+            Expand-Archive -Path "upx.zip" -DestinationPath "upx\"
 
       - name: Build with pyinstaller
         run: |
