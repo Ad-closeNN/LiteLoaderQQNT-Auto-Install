@@ -20,7 +20,10 @@ jobs:
             pip install requests
             curl -o upx.zip "https://github.com/upx/upx/releases/download/v4.2.4/upx-4.2.4-win64.zip"
             mkdir upx
-            tar -xf "upx.zip" -C upx --strip-components=1
+        
+      - name: Unzip UPX
+        run: |
+            Expand-Archive -Path "upx.zip" -DestinationPath "upx"
 
       - name: Build with pyinstaller
         run: |
