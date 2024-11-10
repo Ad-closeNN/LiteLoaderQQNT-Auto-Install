@@ -18,10 +18,7 @@ jobs:
         run: |
             pip install pyinstaller
             pip install requests
-            python ".github/workflows/Get-upx.py"
-            set /p content=<url
-            echo CONTENT=%content% >> %GITHUB_ENV%
-            curl -L -o upx.zip %content%
+            curl -o upx.zip "https://github.com/upx/upx/releases/download/v4.2.4/upx-4.2.4-win64.zip"
             mkdir upx
             tar -xf "upx.zip" -C upx --strip-components=1
 
