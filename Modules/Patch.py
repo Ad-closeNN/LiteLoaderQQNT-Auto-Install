@@ -16,8 +16,26 @@ def patch():
             logging("[System] 最大计算值：" + str(maxbit) + "，为 32 位操作系统")
             bit = "86" # 系统位数： 32 位
         
-        # 调用 GitHub API 获取最新版本信息
-        url = "https://api.github.com/repos/LiteLoaderQQNT/QQNTFileVerifyPatch/releases/latest"
+        # 检测网络环境
+        import socket
+        def check_google():
+            global cg
+            try:
+                socket.create_connection(("google.com", 443), timeout=1)
+                logging("[System] 当前网络环境内可连接 Google")
+                cg = 0
+            except (socket.timeout, socket.error):
+                logging("[System] 当前网络环境内无法连接 Google")
+                cg = 1 # 无法连接 Google 或连接过慢(1s)
+        check_google()
+        
+        # 调用 GitHub/KGitHub  API 获取最新版本信息
+        if cg == 0: # 检查 True/False
+            url = "https://api.github.com/repos/LiteLoaderQQNT/QQNTFileVerifyPatch/releases/latest"
+            logging("[Patch] 已使用官方源获取补丁 API 信息")
+        else:
+            url = "https://api.kkgithub.com/repos/LiteLoaderQQNT/QQNTFileVerifyPatch/releases/latest"
+            logging("[Patch] 已使用 KKGitHub 方式获取补丁 API 信息")
         response = requests.get(url)
         data = response.json()
 
@@ -27,6 +45,23 @@ def patch():
             if f"dbghelp_x{bit}.dll" in asset["browser_download_url"]:
                 download_url = asset["browser_download_url"]
                 break
+        
+        if cg == 0:
+            while True:
+                download_way = input("\n------------\n你当前的环境可以连接 Google，是否使用官方下载源下载\033[1m补丁\033[0m？\n(y/n)\n> ").lower()
+                if download_way == "y" or download_way == "yes":
+                    logging("[Download] 未更改补丁下载链接，继续使用官方下载源")
+                    break
+                elif download_way == "n" or download_way == "no":
+                    print("已使用 ghproxy.cn 进行加速下载")
+                    download_url = download_url.replace("github.com", "ghproxy.cn/?q=https://github.com") # 替换新的下载链接
+                    logging("[Download] 已更改补丁下载源至 ghproxy.cn")
+                    break
+                else:
+                    continue
+        else:
+            download_url = download_url.replace("github.com", "ghproxy.cn/?q=https://github.com") # 替换新的下载链接
+        logging("[Download] 最终的补丁下载链接为：" + download_url)
         
         # 提取包含 "dbghelp_x{bit}.dll" 的 dbghelp.dll 文件大小
         github_file_size = ""

@@ -4,8 +4,24 @@ from Modules.Logger import logger as logging
 def need_download():
         global unzip_folder
         import requests
-        # 调用 GitHub API 获取最新版本信息
-        url = "https://api.github.com/repos/LiteLoaderQQNT/LiteLoaderQQNT/releases/latest"
+        import socket
+        #  检测 Google 是否能连接
+        def check_google():
+            try:
+                socket.create_connection(("google.com", 443), timeout=1)
+                logging("[System] 当前网络环境内可连接 Google")
+                return True
+            except (socket.timeout, socket.error):
+                logging("[System] 当前网络环境内无法连接 Google")
+                return False # 无法连接 Google 或连接过慢(1s)
+            
+        # 调用 GitHub/KGitHub API 获取最新版本信息
+        if check_google(): # 检查 True/False
+            url = "https://api.github.com/repos/LiteLoaderQQNT/LiteLoaderQQNT/releases/latest"
+            logging("[Download] 已使用官方源获取 API 信息")
+        else:
+            url = "https://api.kkgithub.com/repos/LiteLoaderQQNT/LiteLoaderQQNT/releases/latest"
+            logging("[Download] 已使用 KKGitHub 方式获取 API 信息")
         response = requests.get(url)
         data = response.json()
 
@@ -15,6 +31,24 @@ def need_download():
             if "LiteLoaderQQNT.zip" in asset["browser_download_url"]:
                 download_url = asset["browser_download_url"]
                 break
+        
+        if check_google():
+            while True:
+                download_way = input("\n你当前的环境可以连接 Google，是否使用官方下载源下载 LiteLoaderQQNT？\n(y/n)\n> ").lower()
+                if download_way == "y" or download_way == "yes":
+                    logging("[Download] 未更改 LiteLoaderQQNT.zip 下载链接，继续使用官方下载源")
+                    break
+                elif download_way == "n" or download_way == "no":
+                    print("已使用 ghproxy.cn 进行加速下载")
+                    download_url = download_url.replace("github.com", "ghproxy.cn/?q=https://github.com") # 替换新的下载链接
+                    logging("[Download] 已更改 LiteLoaderQQNT.zip 下载源至 ghproxy.cn")
+                    break
+                else:
+                    continue
+        else:
+            download_url = download_url.replace("github.com", "ghproxy.cn/?q=https://github.com") # 替换新的下载链接
+        logging("[Download] 最终的 LiteLoaderQQNT.zip 下载链接为：" + download_url)
+        
 
         # 下载
         if download_url:
